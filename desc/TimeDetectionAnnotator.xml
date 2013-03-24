@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>annotator.TimeDetectionAnnotator</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>Time Detection Annotator</name>
+    <description>This annotates each email only once, and selects it only when it passes certain criterion. 
+    And it records which part of the day does this email was sent/recieved. 
+    Has an int which stores numbers from 0 to 23.</description>
+    <version>1.0</version>
+    <vendor>IIITB OS team 5f</vendor>
+    <configurationParameters/>
+    <configurationParameterSettings/>
+    <typeSystemDescription>
+      <types>
+        <typeDescription>
+          <name>type.TimeDetectionAnnotation</name>
+          <description>This annotation marks whether current mail item is marked or not, and the time slot to which the email belongs to.</description>
+          <supertypeName>uima.tcas.Annotation</supertypeName>
+          <features>
+            <featureDescription>
+              <name>selected</name>
+              <description>selected means the mail is selected if false means ignored.</description>
+              <rangeTypeName>uima.cas.Boolean</rangeTypeName>
+            </featureDescription>
+            <featureDescription>
+              <name>timeSlot</name>
+              <description/>
+              <rangeTypeName>uima.cas.Integer</rangeTypeName>
+            </featureDescription>
+          </features>
+        </typeDescription>
+      </types>
+    </typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported>
+          <language>en</language>
+        </languagesSupported>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+  <resourceManagerConfiguration/>
+</analysisEngineDescription>
