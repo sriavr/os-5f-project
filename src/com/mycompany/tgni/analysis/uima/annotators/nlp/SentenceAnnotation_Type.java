@@ -1,6 +1,6 @@
 
-/* First created by JCasGen Mon Mar 25 03:52:18 IST 2013 */
-package com.mycompany.tgni.uima.annotators.text;
+/* First created by JCasGen Mon Mar 25 14:36:14 IST 2013 */
+package com.mycompany.tgni.analysis.uima.annotators.nlp;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
@@ -12,9 +12,9 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Mon Mar 25 04:34:37 IST 2013
+ * Updated by JCasGen Mon Mar 25 19:01:21 IST 2013
  * @generated */
-public class TextAnnotation_Type extends Annotation_Type {
+public class SentenceAnnotation_Type extends Annotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -22,31 +22,31 @@ public class TextAnnotation_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (TextAnnotation_Type.this.useExistingInstance) {
+  			 if (SentenceAnnotation_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = TextAnnotation_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = SentenceAnnotation_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new TextAnnotation(addr, TextAnnotation_Type.this);
-  			   TextAnnotation_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new SentenceAnnotation(addr, SentenceAnnotation_Type.this);
+  			   SentenceAnnotation_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new TextAnnotation(addr, TextAnnotation_Type.this);
+        } else return new SentenceAnnotation(addr, SentenceAnnotation_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = TextAnnotation.typeIndexID;
+  public final static int typeIndexID = SentenceAnnotation.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("com.mycompany.tgni.uima.annotators.text.TextAnnotation");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("com.mycompany.tgni.analysis.uima.annotators.nlp.SentenceAnnotation");
 
 
 
   /** initialize variables to correspond with Cas Type and Features
 	* @generated */
-  public TextAnnotation_Type(JCas jcas, Type casType) {
+  public SentenceAnnotation_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 

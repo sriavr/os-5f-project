@@ -1,7 +1,7 @@
 
 
-/* First created by JCasGen Mon Mar 25 03:52:18 IST 2013 */
-package com.mycompany.tgni.uima.annotators.text;
+/* First created by JCasGen Mon Mar 25 14:36:14 IST 2013 */
+package com.mycompany.tgni.analysis.uima.annotators.nlp;
 
 import org.apache.uima.jcas.JCas; 
 import org.apache.uima.jcas.JCasRegistry;
@@ -11,15 +11,15 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Mon Mar 25 04:34:37 IST 2013
- * XML source: /home/sridhar/workspace/UIMAwebapp2/desc/NounPhraseAnnotator.xml
+ * Updated by JCasGen Mon Mar 25 19:01:21 IST 2013
+ * XML source: /home/sridhar/workspace/UIMAwebapp2/desc/SentenceAE.xml
  * @generated */
-public class TextAnnotation extends Annotation {
+public class SentenceAnnotation extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(TextAnnotation.class);
+  public final static int typeIndexID = JCasRegistry.register(SentenceAnnotation.class);
   /** @generated
    * @ordered 
    */
@@ -31,23 +31,23 @@ public class TextAnnotation extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected TextAnnotation() {/* intentionally empty block */}
+  protected SentenceAnnotation() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public TextAnnotation(int addr, TOP_Type type) {
+  public SentenceAnnotation(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public TextAnnotation(JCas jcas) {
+  public SentenceAnnotation(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public TextAnnotation(JCas jcas, int begin, int end) {
+  public SentenceAnnotation(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
