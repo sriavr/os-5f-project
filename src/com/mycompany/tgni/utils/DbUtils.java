@@ -1,4 +1,4 @@
-package com.mycompany.tgni.uima.utils;
+package com.mycompany.tgni.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
