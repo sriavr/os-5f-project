@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 
 import opennlp.tools.chunker.ChunkerME;
 import opennlp.tools.chunker.ChunkerModel;
@@ -55,14 +56,33 @@ import javax.servlet.http.HttpServletRequest;
 import com.opensymphony.xwork2.ActionSupport;
 
 public class Graph2Action extends ActionSupport implements ServletRequestAware {
-	public static String modelPath = "D:\\UIMAwebapp2\\conf\\models\\";
-	public HttpServletRequest request;
-	public String sentItemsPath = "D:\\maildir\\campbell-l\\sent_items\\";
-	public String graphName;
-	public String graphPath;
+	private HttpServletRequest request;
+	private String sentItemsPath;
+	private String folderName = "ybarbo-p";
+	private String graphName;
+	private String graphPath;
+	private int numEmails;
+	private static String modelPath = "";
+	private String enronRoot = "";
 
 	public String getGraphPath() {
 		return graphPath;
+	}
+
+	public String getFolderName() {
+		return folderName;
+	}
+
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
+	}
+
+	public int getNumEmails() {
+		return numEmails;
+	}
+
+	public void setNumEmails(int numEmails) {
+		this.numEmails = numEmails;
 	}
 
 	public void setGraphPath(String graphPath) {
@@ -79,9 +99,24 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 
 	@Override
 	public String execute() throws Exception {
+		Properties properties = new Properties();
+		try {
+			properties.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("myapp.properties"));
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		modelPath = properties.getProperty("modelDir");
+		System.out.println("modelDir:" + modelPath);
+		enronRoot = properties.getProperty("enronRoot");
+		System.out.println("enronRoot:" + enronRoot);
 		int value = 15, min = 1, max = 50;
 		ArrayList<POScount> list = new ArrayList<POScount>();
-
+		sentItemsPath = enronRoot + File.separator + folderName
+				+ File.separator + "sent_items";
+		System.out.println("sentItemsPath: " + sentItemsPath);
 		list = getPOSList(new File(sentItemsPath));
 		double[] adjArr = new double[list.size()];
 		double[] advArr = new double[list.size()];
@@ -99,7 +134,7 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		dataset.addSeries("Adjectives", adjArr, value, min, max);
 		dataset.addSeries("Adverbs", advArr, 10, min, 20);
 		dataset.addSeries("Verbs", verArr, value, min, max);
-		//dataset.addSeries("Nouns", verArr, 80, min, 300);
+		// dataset.addSeries("Nouns", verArr, 80, min, 300);
 		String plotTitle = "Parts of speech in emails histogram";
 		String xaxis = "Number of parts of speech";
 		String yaxis = "Number of emails";
@@ -111,21 +146,28 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 				yaxis, dataset, orientation, show, toolTips, urls);
 		int width = 1000;
 		int height = 1000;
+
 		try {
-			ChartUtilities.saveChartAsPNG(new File("D:\\histogram.PNG"), chart,
-					width, height);
-		} catch (IOException e) {
-			e.printStackTrace();
+			String filepath = request.getRealPath("/graphs");
+			String ext = "jpeg";
+			// File dir = new File("D:\\");
+			graphName = "graph1"
+					+ String.format("%s.%s",
+							RandomStringUtils.randomAlphanumeric(8), ext);
+			graphPath = filepath + File.separator + graphName;
+			// String name="graph1.jpeg";
+			System.out.println(graphPath);
+			ChartUtilities.saveChartAsPNG(new File(graphPath), chart, width,
+					height);
+			System.out.println("Chart generated.");
+		} catch (Exception e) {
+			System.out.println("Problem occurred creating chart.");
 		}
 
 		return SUCCESS;
 	}
 
-	public void drawGraph(double value[]) {
-
-	}
-
-	private static ArrayList<POScount> getPOSList(File Dir) {
+	private ArrayList<POScount> getPOSList(File Dir) {
 		ArrayList<POScount> posList = new ArrayList<POScount>();
 		POScount posCount = new POScount();
 		System.out.println(Dir.getName());
@@ -133,7 +175,10 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 
 			File[] list = Dir.listFiles();
 			try {
-				for (int k = 0; k < list.length; k++) {
+				System.out.println("numEmails:" + numEmails);
+				if (numEmails == 0)
+					numEmails = list.length;
+				for (int k = 0; k < list.length && k < numEmails; k++) {
 					if (list[k].isDirectory())
 						continue;
 					String temp = readFile(list[k]);
@@ -159,13 +204,7 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		return posList;
 	}
 
-	@Override
-	public void setServletRequest(HttpServletRequest arg0) {
-		this.request = arg0;
-
-	}
-
-	private static String readFile(File file) throws IOException {
+	private String readFile(File file) throws IOException {
 		FileInputStream stream = new FileInputStream(file);
 		try {
 			FileChannel fc = stream.getChannel();
@@ -178,7 +217,7 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		}
 	}
 
-	public static POScount countPOS(String text) throws Exception {
+	public POScount countPOS(String text) throws Exception {
 		POScount posCount = new POScount();
 		SentenceDetectorME sentenceDetector;
 		TokenizerME tokenizer;
@@ -190,19 +229,22 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		InputStream pmis = null;
 		InputStream cmis = null;
 		try {
-			smis = new FileInputStream(new File(modelPath + "en-sent.bin"));
-			tmis = new FileInputStream(new File(modelPath + "en-token.bin"));
-			pmis = new FileInputStream(
-					new File(modelPath + "en-pos-maxent.bin"));
-			cmis = new FileInputStream(new File(modelPath + "en-chunker.bin"));
+			smis = new FileInputStream(new File(modelPath + File.separator
+					+ "en-sent.bin"));
+			tmis = new FileInputStream(new File(modelPath + File.separator
+					+ "en-token.bin"));
+			pmis = new FileInputStream(new File(modelPath + File.separator
+					+ "en-pos-maxent.bin"));
+			// cmis = new FileInputStream(new File(modelPath + File.separator
+			// + "en-chunker.bin"));
 			SentenceModel smodel = new SentenceModel(smis);
 			sentenceDetector = new SentenceDetectorME(smodel);
 			TokenizerModel tmodel = new TokenizerModel(tmis);
 			tokenizer = new TokenizerME(tmodel);
 			POSModel pmodel = new POSModel(pmis);
 			posTagger = new POSTaggerME(pmodel);
-			ChunkerModel cmodel = new ChunkerModel(cmis);
-			chunker = new ChunkerME(cmodel);
+			// ChunkerModel cmodel = new ChunkerModel(cmis);
+			// chunker = new ChunkerME(cmodel);
 		} finally {
 			IOUtils.closeQuietly(cmis);
 			IOUtils.closeQuietly(pmis);
@@ -235,4 +277,10 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		}
 		return posCount;
 	}
+
+	@Override
+	public void setServletRequest(HttpServletRequest arg0) {
+		this.request = arg0;
+	}
+
 }
