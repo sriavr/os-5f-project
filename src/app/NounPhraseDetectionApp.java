@@ -41,7 +41,7 @@ public class NounPhraseDetectionApp {
 		AnalysisEngine ae = null;
 		try {
 			ae = com.mycompany.tgni.utils.UimaUtils.getAE(
-					"desc/NounPhraseAnnotator.xml", null);
+					"/home/sridhar/workspace/UIMAwebapp2/desc/NounPhraseAnnotator.xml", null);
 		} catch (InvalidXMLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
