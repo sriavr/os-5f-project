@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tiles-definitions>
+
+	<definition name="baseLayout" template="/BaseLayout.jsp">
+		<put-attribute name="header" value="/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/footer.jsp" />
+	</definition>
+
+	<definition name="welcome.tiles" extends="baseLayout">
+		<put-attribute name="body" value="/welcome.jsp" />
+	</definition>
+
+	<definition name="graph1.tiles" extends="baseLayout">
+		<put-attribute name="body" value="/graph1.jsp" />
+	</definition>
+
+	<definition name="graph2.tiles" extends="baseLayout">
+		<put-attribute name="body" value="/graph2.jsp" />
+	</definition>
+	
+	<definition name="error.tiles" extends="baseLayout">
+		<put-attribute name="body" value="/error.jsp" />
+	</definition>
+</tiles-definitions>
