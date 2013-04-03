@@ -5,10 +5,23 @@
 
 <struts>
 	<package name="default" extends="struts-default">
+		<result-types>
+			<result-type name="tiles"
+				class="org.apache.struts2.views.tiles.TilesResult" />
+		</result-types>
 
 		<action name="login" class="action.DefaultAction">
-			<result name="success">welcome.jsp</result>
-			<result name="failure">error.jsp</result>
+			<result name="success" type="tiles">welcome.tiles</result>
+			<result name="failure" type="tiles">error.tiles</result>
+		</action>
+
+		<action name="graph1" class="action.Graph1Action">
+			<result name="success" type="tiles">graph1.tiles</result>
+			<result name="failure" type="tiles">error.tiles</result>
+		</action>
+		<action name="graph2" class="action.Graph2Action">
+			<result name="success" type="tiles">graph2.tiles</result>
+			<result name="failure" type="tiles">error.tiles</result>
 		</action>
 
 	</package>
