@@ -1,5 +1,6 @@
 package action;
 
+import java.awt.Color;
 import java.io.File;
 
 import model.POScount;
@@ -38,7 +39,9 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 //import java.util.Random;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.general.DefaultPieDataset;
 import java.io.File;
 import java.nio.MappedByteBuffer;
@@ -58,12 +61,81 @@ import com.opensymphony.xwork2.ActionSupport;
 public class Graph2Action extends ActionSupport implements ServletRequestAware {
 	private HttpServletRequest request;
 	private String sentItemsPath;
-	private String folderName = "ybarbo-p";
+	private String folderName = "";
 	private String graphName;
 	private String graphPath;
 	private int numEmails;
 	private static String modelPath = "";
 	private String enronRoot = "";
+	private boolean adjective = true, adverb = true, noun, verb = true;
+	private String sampleSize = "5";
+	private String graph = "histogram";
+	private int width = 800;
+	private int height = 800;
+
+	public String getGraph() {
+		return graph;
+	}
+
+	public void setGraph(String graph) {
+		this.graph = graph;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public boolean isVerb() {
+		return verb;
+	}
+
+	public void setVerb(boolean verb) {
+		this.verb = verb;
+	}
+
+	public String getSampleSize() {
+		return sampleSize;
+	}
+
+	public void setSampleSize(String sampleSize) {
+		this.sampleSize = sampleSize;
+	}
+
+	public boolean isAdjective() {
+		return adjective;
+	}
+
+	public void setAdjective(boolean adjective) {
+		this.adjective = adjective;
+	}
+
+	public boolean isAdverb() {
+		return adverb;
+	}
+
+	public void setAdverb(boolean adverb) {
+		this.adverb = adverb;
+	}
+
+	public boolean isNoun() {
+		return noun;
+	}
+
+	public void setNoun(boolean noun) {
+		this.noun = noun;
+	}
 
 	public String getGraphPath() {
 		return graphPath;
@@ -99,71 +171,187 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 
 	@Override
 	public String execute() throws Exception {
+		if (sampleSize.trim().equals("5")) {
+			numEmails = 5;
+		} else if (sampleSize.trim().equals("20")) {
+			numEmails = 20;
+		} else if (sampleSize.trim().equals("all")) {
+			numEmails = 10000;
+		} else {
+			numEmails = 5;
+		}
+
 		Properties properties = new Properties();
 		try {
 			properties.load(Thread.currentThread().getContextClassLoader()
 					.getResourceAsStream("myapp.properties"));
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		modelPath = properties.getProperty("modelDir");
-		System.out.println("modelDir:" + modelPath);
-		enronRoot = properties.getProperty("enronRoot");
-		System.out.println("enronRoot:" + enronRoot);
-		int value = 15, min = 1, max = 50;
-		ArrayList<POScount> list = new ArrayList<POScount>();
-		sentItemsPath = enronRoot + File.separator + folderName
-				+ File.separator + "sent_items";
-		System.out.println("sentItemsPath: " + sentItemsPath);
-		list = getPOSList(new File(sentItemsPath));
-		double[] adjArr = new double[list.size()];
-		double[] advArr = new double[list.size()];
-		double[] verArr = new double[list.size()];
-		double[] nounArr = new double[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			adjArr[i] = list.get(i).adjectives;
-			advArr[i] = list.get(i).adverbs;
-			verArr[i] = list.get(i).verbs;
-			nounArr[i] = list.get(i).nouns;
+			return ERROR;
 		}
 
-		HistogramDataset dataset = new HistogramDataset();
-		dataset.setType(HistogramType.FREQUENCY);
-		dataset.addSeries("Adjectives", adjArr, value, min, max);
-		dataset.addSeries("Adverbs", advArr, 10, min, 20);
-		dataset.addSeries("Verbs", verArr, value, min, max);
-		// dataset.addSeries("Nouns", verArr, 80, min, 300);
-		String plotTitle = "Parts of speech in emails histogram";
-		String xaxis = "Number of parts of speech";
-		String yaxis = "Number of emails";
-		PlotOrientation orientation = PlotOrientation.VERTICAL;
-		boolean show = true;
-		boolean toolTips = true;
-		boolean urls = true;
-		JFreeChart chart = ChartFactory.createHistogram(plotTitle, xaxis,
-				yaxis, dataset, orientation, show, toolTips, urls);
-		int width = 1000;
-		int height = 1000;
+		if (!folderName.isEmpty()) {
+			modelPath = properties.getProperty("modelDir");
+			System.out.println("modelDir:" + modelPath);
+			enronRoot = properties.getProperty("enronRoot");
+			System.out.println("enronRoot:" + enronRoot);
+			int value = 15, min = 1, max = 50;
+			ArrayList<POScount> list = new ArrayList<POScount>();
+			sentItemsPath = enronRoot + File.separator + folderName
+					+ File.separator + "sent_items";
+			System.out.println("sentItemsPath: " + sentItemsPath);
+			list = getPOSList(new File(sentItemsPath));
+			double[] adjArr = new double[list.size()];
+			double[] advArr = new double[list.size()];
+			double[] verArr = new double[list.size()];
+			double[] nounArr = new double[list.size()];
+			double[] emotiveness = new double[list.size()];
+			int temp;
+			for (int i = 0; i < list.size(); i++) {
+				adjArr[i] = list.get(i).adjectives;
+				advArr[i] = list.get(i).adverbs;
+				verArr[i] = list.get(i).verbs;
+				nounArr[i] = list.get(i).nouns;
+				temp = (int) (verArr[i] + nounArr[i]);
+				if (temp != 0)
+					emotiveness[i] = (adjArr[i] + advArr[i]) / temp;
+			}
 
-		try {
-			String filepath = request.getRealPath("/graphs");
-			String ext = "jpeg";
-			// File dir = new File("D:\\");
-			graphName = "graph1"
-					+ String.format("%s.%s",
-							RandomStringUtils.randomAlphanumeric(8), ext);
-			graphPath = filepath + File.separator + graphName;
-			// String name="graph1.jpeg";
-			System.out.println(graphPath);
-			ChartUtilities.saveChartAsPNG(new File(graphPath), chart, width,
-					height);
-			System.out.println("Chart generated.");
-		} catch (Exception e) {
-			System.out.println("Problem occurred creating chart.");
+			if (graph.trim().endsWith("histogram")) {
+				HistogramDataset dataset = new HistogramDataset();
+				dataset.setType(HistogramType.FREQUENCY);
+				if (adjective)
+					dataset.addSeries("Adjectives", adjArr, value, min, max);
+				if (adverb)
+					dataset.addSeries("Adverbs", advArr, 10, min, 20);
+				if (verb)
+					dataset.addSeries("Verbs", verArr, value, min, max);
+				if (noun)
+					dataset.addSeries("Nouns", nounArr, 80, min, 300);
+				String plotTitle = "Parts of speech in emails histogram";
+				String xaxis = "Number of parts of speech";
+				String yaxis = "Number of emails";
+				PlotOrientation orientation = PlotOrientation.VERTICAL;
+				boolean show = true;
+				boolean toolTips = true;
+				boolean urls = true;
+				JFreeChart chart = ChartFactory.createHistogram(plotTitle,
+						xaxis, yaxis, dataset, orientation, show, toolTips,
+						urls);
+				int width = 1000;
+				int height = 1000;
+
+				try {
+					String filepath = request.getRealPath("/graphs");
+					String ext = "jpeg";
+					// File dir = new File("D:\\");
+					graphName = "graph1"
+							+ String.format("%s.%s",
+									RandomStringUtils.randomAlphanumeric(8),
+									ext);
+					graphPath = filepath + File.separator + graphName;
+					// String name="graph1.jpeg";
+					System.out.println(graphPath);
+					ChartUtilities.saveChartAsPNG(new File(graphPath), chart,
+							width, height);
+					System.out.println("Chart generated.");
+
+				} catch (Exception e) {
+					System.out.println("Problem occurred creating chart.");
+					return ERROR;
+				}
+			}
+
+			else if (graph.trim().endsWith("piechart")) {
+				DefaultPieDataset pieDataset = new DefaultPieDataset();
+				if (adjective)
+					pieDataset.setValue("Adjective", countArr(adjArr));
+				if (noun)
+					pieDataset.setValue("Noun", countArr(nounArr));
+				if (verb)
+					pieDataset.setValue("Verb", countArr(verArr));
+				if (adverb)
+					pieDataset.setValue("Adverb", countArr(advArr));
+				JFreeChart chart = ChartFactory.createPieChart3D(
+						"Email distribution", pieDataset, true, true, true);
+				PiePlot3D p = (PiePlot3D) chart.getPlot();
+				p.setForegroundAlpha(0.9f);
+				p.setBackgroundPaint(Color.white);
+				p.setOutlineVisible(false);
+				try {
+					String filepath = request.getRealPath("/graphs");
+					String ext = "jpeg";
+					// File dir = new File("D:\\");
+					graphName = "graphPie"
+							+ String.format("%s.%s",
+									RandomStringUtils.randomAlphanumeric(8),
+									ext);
+					graphPath = filepath + File.separator + graphName;
+					// String name="graph1.jpeg";
+					System.out.println(graphPath);
+					ChartUtilities.saveChartAsJPEG(new File(graphPath), chart,
+							width, height);
+					System.out.println("Chart generated.");
+				} catch (Exception e) {
+					System.out.println("Problem occurred creating chart.");
+				}
+			}
+//			 else if (graph.trim().equals("xychart")) {
+//					XYSeriesCollection dataset = new XYSeriesCollection();
+//
+//					XYSeries noun = new XYSeries("noun");
+//					XYSeries adjective = new XYSeries("adjective");
+//					XYSeries adverb = new XYSeries("adverb");
+//					XYSeries verb = new XYSeries("verb");
+//					XYSeries emotiveness = new XYSeries("emotiveness");
+//					final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+//			        renderer.setSeriesLinesVisible(0, false);
+//			        renderer.setSeriesShapesVisible(1, false);
+//			        
+//					for (int i = 0; i <= list.size(); i++) {
+//						noun.add(i, nounArr[i]);
+//						adjective.add(i, adjArr[i]);
+//						adverb.add(i, adjArr[i]);
+//						verb.add(i, verArr[i]);
+//					}
+//
+//					if (inbox)
+//						dataset.addSeries(inboxData);
+//					if (sentItems)
+//						dataset.addSeries(sentItemsData);
+//					if (delItems)
+//						dataset.addSeries(delItemsData);
+//					if (allItems)
+//						dataset.addSeries(allItemsData);
+//
+//					JFreeChart chart2 = ChartFactory.createScatterPlot(
+//							"Number of emails vs Employees", // chart title
+//							"Enron Employees ", // x axis label
+//							"Number of emails", // y axis label
+//							dataset, // data
+//							PlotOrientation.VERTICAL, true, // include legend
+//							true, // tooltips
+//							false);
+//					try {
+//
+//						String filepath = request.getRealPath("/graphs");
+//						String ext = "jpeg";
+//						// File dir = new File("D:\\");
+//						graphName = "graph1"
+//								+ String.format("%s.%s",
+//										RandomStringUtils.randomAlphanumeric(8), ext);
+//						graphPath = filepath + File.separator + graphName;
+//						// String name="graph1.jpeg";
+//						System.out.println(graphPath);
+//						ChartUtilities.saveChartAsJPEG(new File(graphPath), chart2,
+//								width, height);
+//						System.out.println("Chart generated.");
+//					} catch (Exception e) {
+//						System.out.println("Problem occurred creating chart.");
+//					}
+//				}			
 		}
-
 		return SUCCESS;
 	}
 
@@ -283,4 +471,11 @@ public class Graph2Action extends ActionSupport implements ServletRequestAware {
 		this.request = arg0;
 	}
 
+	private double countArr(double[] inboxArr) {
+		double temp = 0;
+		for (int i = 0; i < inboxArr.length; i++) {
+			temp = temp + inboxArr[i];
+		}
+		return temp;
+	}
 }
