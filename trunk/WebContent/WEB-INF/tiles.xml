@@ -18,8 +18,12 @@
 	<definition name="graph2.tiles" extends="baseLayout">
 		<put-attribute name="body" value="/graph2.jsp" />
 	</definition>
-	
+
 	<definition name="error.tiles" extends="baseLayout">
 		<put-attribute name="body" value="/error.jsp" />
+	</definition>
+
+	<definition name="viewEmp.tiles" extends="baseLayout">
+		<put-attribute name="body" value="/viewEmployees.jsp" />
 	</definition>
 </tiles-definitions>

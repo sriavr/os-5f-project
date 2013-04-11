@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <div class="row">
-	<h1>FOOTER COMES HERE</h1>
+	Developed by Sridhar Jammalamada, Nivedita Singh, Manzoor Hunagund,
+	Pavan Kumar Yeleswarapu<br> &copy;International Institute of
+	Information Technology, Bangalore
 </div>
 
 <script>

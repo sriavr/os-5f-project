@@ -19,11 +19,16 @@
 			<result name="success" type="tiles">graph1.tiles</result>
 			<result name="failure" type="tiles">error.tiles</result>
 		</action>
+
 		<action name="graph2" class="action.Graph2Action">
 			<result name="success" type="tiles">graph2.tiles</result>
 			<result name="failure" type="tiles">error.tiles</result>
 		</action>
 
+		<action name="viewEmp" class="action.ViewEmployeeAction">
+			<result name="success" type="tiles">viewEmp.tiles</result>
+			<result name="failure" type="tiles">error.tiles</result>
+		</action>
 	</package>
 
 </struts>
