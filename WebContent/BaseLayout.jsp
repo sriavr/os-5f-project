@@ -13,10 +13,10 @@
 <link rel="stylesheet" href="styles/avgrund.css" />
 <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
 <script src='js/jquery.zoom.js'></script>
-<script src='js/jquery.dropkick-1.0.0.js'></script>
-<link rel="stylesheet" href="js/dropkick.css" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Carter+One&v1'
-	rel='stylesheet' type='text/css'>
+<!-- <script src='js/jquery.dropkick-1.0.0.js'></script> -->
+<!-- <link rel="stylesheet" href="js/dropkick.css" type="text/css"> -->
+<!-- <link href='http://fonts.googleapis.com/css?family=Carter+One&v1' -->
+<!-- 	rel='stylesheet' type='text/css'> -->
 <style type="text/css">
 .btn-generate {
 	width: 250px;
