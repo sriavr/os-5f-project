@@ -22,15 +22,22 @@ package app;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.FSIterator;
+import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.XMLInputSource;
+
+import annotation.DateTimeAnnotation;
 
 import util.PrintAnnotations;
 
@@ -72,10 +79,26 @@ public class MainApp1 {
 			// Read and validate command line arguments
 			boolean validArgs = false;
 			if (args.length != 2) {
-				taeDescriptor = new File(
-						"/home/sridhar/OS-Spring-2013/OS-project/apache-uima/examples/descriptors/analysis_engine/NamesAndPersonTitles_TAE.xml");
-				inputDir = new File("/home/sridhar/UIMAwebapp/data");
+				Properties properties = new Properties();
+				try {
+					properties.load(Thread.currentThread()
+							.getContextClassLoader()
+							.getResourceAsStream("myapp.properties"));
 
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String modelDir = properties.getProperty("modelDir");
+				System.out.println("modelDir:" + modelDir);
+				String enronRoot = properties.getProperty("enronRoot");
+				System.out.println("enronRoot:" + enronRoot);
+				String descRoot = properties.getProperty("descRoot");
+				System.out.println("descRoot:" + descRoot);
+				inputDir = new File(enronRoot);
+
+				taeDescriptor = new File(descRoot + File.separator
+						+ "EmailAnnotator.xml");
 				validArgs = taeDescriptor.exists()
 						&& !taeDescriptor.isDirectory()
 						&& inputDir.isDirectory();
@@ -103,7 +126,7 @@ public class MainApp1 {
 				CAS cas = ae.newCAS();
 
 				// get all files in the input directory
-				//File[] files = inputDir.listFiles();
+				// File[] files = inputDir.listFiles();
 				addFilesFromDir(inputDir);
 				if (mFiles == null || mFiles.size() == 0) {
 					System.out.println("No files to process");
@@ -143,7 +166,7 @@ public class MainApp1 {
 	 */
 	private static void processFile(File aFile, AnalysisEngine aAE, CAS aCAS)
 			throws IOException, AnalysisEngineProcessException {
-		System.out.println("Processing file " + aFile.getName());
+		// System.out.println("Processing file " + aFile.getName());
 
 		String document = FileUtils.file2String(aFile);
 		document = document.trim();
@@ -155,10 +178,27 @@ public class MainApp1 {
 		aAE.process(aCAS);
 
 		// print annotations to System.out
-		PrintAnnotations.printAnnotations(aCAS, System.out);
+		Type dateTimeAnnotation = aCAS.getTypeSystem().getType(
+				"annotation.DateTimeAnnotation");
+		printDateTimeAnnotations(aCAS, dateTimeAnnotation, System.out);
 
 		// reset the CAS to prepare it for processing the next document
 		aCAS.reset();
+	}
+
+	public static void printDateTimeAnnotations(CAS aCAS,
+			Type dateTimeAnnotation, PrintStream out) {
+		FSIterator iter = aCAS.getAnnotationIndex(dateTimeAnnotation)
+				.iterator();
+
+		// iterate
+		while (iter.isValid()) {
+			FeatureStructure fs = iter.get();
+			DateTimeAnnotation annotation = (DateTimeAnnotation) fs;
+			System.out.println("Email received time:"
+					+ annotation.getEmailReceivedDateTime());
+			iter.moveToNext();
+		}
 	}
 
 }

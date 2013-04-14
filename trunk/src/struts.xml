@@ -25,6 +25,11 @@
 			<result name="failure" type="tiles">error.tiles</result>
 		</action>
 
+		<action name="timegraph1" class="action.TimeGraph1Action">
+			<result name="success" type="tiles">timegraph1.tiles</result>
+			<result name="failure" type="tiles">error.tiles</result>
+		</action>
+		
 		<action name="viewEmp" class="action.ViewEmployeeAction">
 			<result name="success" type="tiles">viewEmp.tiles</result>
 			<result name="failure" type="tiles">error.tiles</result>
